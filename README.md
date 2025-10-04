@@ -21,20 +21,20 @@
 
 ## 📋 Table of Contents
 
-- [Quick Start](#quick-start)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Quick Start](#-quick-start)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
   - [Web Interface (Gradio)](#web-interface-gradio)
   - [Command Line Interface](#command-line-interface)
   - [Python API](#python-api)
   - [REST API](#rest-api)
-- [Configuration](#configuration)
-- [Model Recommendations](#model-recommendations)
-- [Examples](#examples)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
+- [Configuration](#-configuration)
+- [Model Recommendations](#-model-recommendations)
+- [Examples](#-examples)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🎯 Quick Start
 
