@@ -6,6 +6,10 @@ from tempfile import NamedTemporaryFile
 from PIL import Image
 import json
 import re
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiFinder(BaseFinder):
@@ -26,7 +30,7 @@ class GeminiFinder(BaseFinder):
         super().__init__(api_key, model_name, generation_config, system_prompt, executor)
         genai.configure(api_key=api_key)
 
-        print(f"DEBUG - Generation config: {generation_config}")
+        logger.debug(f"Generation config: {generation_config}")
         self.model = genai.GenerativeModel(
             model_name=model_name,
             generation_config=generation_config,
@@ -47,35 +51,34 @@ class GeminiFinder(BaseFinder):
                         [segment_image, self.element_finder_prompt(prompt)]
                     )
                     response_text = response.text.strip()
-                    print(f"DEBUG - Gemini raw response: '{response_text}'")
-                    print(f"DEBUG - Response type: {type(response_text)}")
+                    logger.debug(f"Gemini raw response: '{response_text}'")
+                    logger.debug(f"Response type: {type(response_text)}")
 
                     # Try to extract JSON from response
                     # Sometimes Gemini wraps JSON in markdown code blocks
                     json_match = re.search(r'```json\s*(\{.*?\})\s*```', response_text, re.DOTALL)
                     if json_match:
                         response_text = json_match.group(1)
-                        print(f"DEBUG - Extracted JSON from markdown: '{response_text}'")
-
-                    # Or it might just have extra text before/after
-                    json_match = re.search(r'\{[^{}]*"ymin"[^{}]*\}', response_text)
-                    if json_match:
-                        response_text = json_match.group(0)
-                        print(f"DEBUG - Extracted JSON object: '{response_text}'")
+                        logger.debug(f"Extracted JSON from markdown: '{response_text}'")
+                    else:
+                        # Or it might just have extra text before/after
+                        json_match = re.search(r'\{[^{}]*"ymin"[^{}]*\}', response_text)
+                        if json_match:
+                            response_text = json_match.group(0)
+                            logger.debug(f"Extracted JSON object: '{response_text}'")
 
                     # Validate it's valid JSON
                     try:
                         parsed = json.loads(response_text)
-                        print(f"DEBUG - Parsed JSON successfully: {parsed}")
+                        logger.debug(f"Parsed JSON successfully: {parsed}")
                     except json.JSONDecodeError as je:
-                        print(f"DEBUG - JSON decode error: {je}")
-                        print(f"DEBUG - Failed to parse: '{response_text}'")
+                        logger.debug(f"JSON decode error: {je}")
+                        logger.debug(f"Failed to parse: '{response_text}'")
 
                     return (response_text, coordinates)
             except Exception as e:
                 # Log the exception or handle it as necessary
-                print(f"Attempt {attempt + 1} failed with exception: {e}")
-                import traceback
+                logger.error(f"Attempt {attempt + 1} failed with exception: {e}")
                 traceback.print_exc()
 
                 # Increment the attempt counter
