@@ -1,6 +1,6 @@
 gemini:
   api_key: !ENV GEMINI_API_KEY
-  model_name: gemini-1.5-flash
+  model_name: gemini-3-flash-preview
   image_width: 768
   image_height: 768
   output_width: 1000  # max range of outputted values
@@ -12,24 +12,29 @@ gemini:
     osx:
       image_width: 768
     generation_config:
-      temperature: 0.7
+      temperature: 1.0
       top_p: 0.95
-      top_k: 40
-      max_output_tokens: 200
+      max_output_tokens: 65536
       response_mime_type: text/plain
   finder:
     image_width: 768
     image_height: 768
+    output_width: 1000  # max range of outputted values
+    output_height: 1000
     android:
+      image_width: 768
+      image_height: 768
       output_width: 1000  # max range of outputted values
       output_height: 1000
     osx:
       image_width: 768
+      output_width: 1000
+      output_height: 1000
     generation_config:
       temperature: 0.95
       top_p: 0.99
       top_k: 20
-      max_output_tokens: 80
+      max_output_tokens: 4096
       response_mime_type: application/json
 
 openai:
