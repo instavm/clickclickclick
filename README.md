@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/68fc3475-2299-4254-8673-3123356177b5
 
 Currently supporting local models via Ollama (Llama 3.2-vision, qwen3.5:4b), Gemini, GPT 4o. The current code is highly experimental and will evolve in future commits. Please use at your own risk.
 
-The best result currently comes from using GPT 4o/4o-mini as planner and Gemini Pro/Flash as finder.
+The best result currently comes from using Gemini 3.1 Flash-Lite as both planner and finder.
 
 **Ollama models:** qwen3.5:4b works as planner (slow, basic navigation) but not reliable as finder (poor UI element detection). Use with `--image-quality=45` for better performance.
 
