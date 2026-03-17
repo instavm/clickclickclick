@@ -1,9 +1,9 @@
 gemini:
   api_key: !ENV GEMINI_API_KEY
-  model_name: gemini-1.5-flash
+  model_name: gemini-3.1-flash-lite-preview
   image_width: 768
   image_height: 768
-  output_width: 1000  # max range of outputted values
+  output_width: 1000
   output_height: 1000
   planner:
     image_width: 768
@@ -19,10 +19,8 @@ gemini:
       response_mime_type: text/plain
   finder:
     image_width: 768
-    image_height: 768
     android:
-      output_width: 1000  # max range of outputted values
-      output_height: 1000
+      image_width: 768
     osx:
       image_width: 768
     generation_config:
@@ -33,65 +31,26 @@ gemini:
       response_mime_type: application/json
 
 openai:
-  api_key: !ENV  OPENAI_API_KEY # OPENAI_API_KEY / AZURE_OPENAI_API_KEY
-  model_name: gpt-4.1-mini # gpt-4o-mini / azure's model name
+  api_key: !ENV  AZURE_OPENAI_API_KEY # OPENAI_API_KEY / AZURE_OPENAI_API_KEY
+  model_name: 4o-new-aug # gpt-4o-mini / azure's model name
   image_width: 512
   image_height: 512
   output_width: 512
   output_height: 512
-  # azure_endpoint: https://openai-fallible.openai.azure.com
-  api_type: openai  # openai / azure
+  azure_endpoint: https://openai-fallible.openai.azure.com
+  api_type: azure  # openai / azure
 #   base_url: https://api.x.ai/v1/ # either base_url or azure_endpoint
   api_version: 2024-10-21
 
 ollama:
   image_width: 1120
   image_height: 1120
-  model_name: llama3.2:latest  # llama3.2:latest doesnt support image
+  output_width: 1120
+  output_height: 1120
+  model_name: qwen3.5:4b  # qwen3.5:4b for planner
   finder:
-    model_name: llama3.2-vision  # llama3.2-vision doesnt support function calling yet
-
-mlx:
-  image_width: 512
-  image_height: 512
-  output_width: 100  # max range of outputted values
-  output_height: 100
-  finder:
-    output_width: 100
-    model_path: mlx-community/Molmo-7B-D-0924-4bit
-
-anthropic:
-  api_key: !ENV ANTHROPIC_API_KEY
-  model_name: claude-sonnet-4-0
-  image_width: 512
-  image_height: 512
-  output_width: 512
-  output_height: 512
-  planner:
-    image_width: 512
-    android:
-      image_width: 512
-    osx:
-      image_width: 512
-  finder:
-    image_width: 512
-    image_height: 512
-    android:
-      output_width: 512
-      output_height: 512
-    osx:
-      image_width: 512
-
-# Executor-specific configurations
-executor:
-  android:
-    screen_center_x: 500
-    screen_center_y: 1000
-    scroll_distance: 1000
-    swipe_distance: 600
-    long_press_duration: 1000
-  osx:
-    screen_center_x: 640
-    screen_center_y: 360
-    scroll_distance: 500
-    click_delay: 0.1
+    image_width: 1120
+    image_height: 1120
+    output_width: 1120
+    output_height: 1120
+    model_name: qwen3.5:4b  # qwen3.5:4b for finder

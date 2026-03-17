@@ -1,17 +1,13 @@
 from . import Executor
+import pyautogui
 from typing import List, Union
 import logging
 import io
 import base64
 from PIL import Image
+import applescript
 from tempfile import NamedTemporaryFile
 from . import logger
-
-try:
-    import pyautogui
-    import applescript
-except Exception as e:
-    print(f"warn: import error in osx.py {e}")
 
 
 class MacExecutor(Executor):
@@ -19,11 +15,15 @@ class MacExecutor(Executor):
         super().__init__()
         self.screenshot_as_base64 = False
         self.screenshot_as_tempfile = False
+        self.image_scale_factor = 1.0  # Track scale factor for coordinate translation
 
     def move_mouse(self, x: int, y: int, observation: str) -> bool:
         try:
-            logger.debug(f"move mouse x y {x} {y}")
-            pyautogui.moveTo(y, x, 1)
+            # Scale coordinates back to original screen size
+            scaled_x = int(x * self.image_scale_factor)
+            scaled_y = int(y * self.image_scale_factor)
+            logger.debug(f"move mouse x y {x} {y} -> scaled {scaled_x} {scaled_y} (scale_factor: {self.image_scale_factor})")
+            pyautogui.moveTo(scaled_y, scaled_x, 1)
             return True
         except Exception as e:
             logger.exception("Error in move_mouse")
@@ -76,15 +76,15 @@ class MacExecutor(Executor):
 
     def click_at_a_point(self, x: int, y: int, observation: str) -> bool:
         try:
-            logger.debug(f"click at a point x y {x} {y}")
-            pyautogui.click(x=y, y=x, duration=1)
+            # Scale coordinates back to original screen size
+            scaled_x = int(x * self.image_scale_factor)
+            scaled_y = int(y * self.image_scale_factor)
+            logger.debug(f"click at a point x y {x} {y} -> scaled {scaled_x} {scaled_y} (scale_factor: {self.image_scale_factor})")
+            pyautogui.click(x=scaled_y, y=scaled_x, duration=1)
             return True
         except Exception as e:
             logger.exception("Error in click_at_a_point")
             return False
-
-    def long_press_at_a_point(self, x: int, y: int, observation: str, duration: int = 1000):
-        raise NotImplementedError("Long press is not implemented on Mac")
 
     def swipe_left(self, observation: str) -> bool:
         raise NotImplementedError("Swipe left is not implemented on Mac")
@@ -127,6 +127,19 @@ class MacExecutor(Executor):
         try:
             logger.debug(f"Take a screenshot use_tempfile={use_tempfile}")
             screenshot = pyautogui.screenshot()
+
+            # Resize image based on quality setting
+            if hasattr(self, 'image_quality') and self.image_quality < 100:
+                quality_ratio = self.image_quality / 100.0
+                new_width = int(screenshot.width * quality_ratio)
+                new_height = int(screenshot.height * quality_ratio)
+                screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
+                # Store scale factor for coordinate translation (inverse of quality ratio)
+                self.image_scale_factor = 100.0 / self.image_quality
+                logger.debug(f"Resized screenshot from original to {new_width}x{new_height} (quality: {self.image_quality}%, scale_factor: {self.image_scale_factor})")
+            else:
+                self.image_scale_factor = 1.0
+
             if use_tempfile or self.screenshot_as_tempfile:
                 with NamedTemporaryFile(delete=False, suffix=".png") as temp_file:
                     screenshot.save(temp_file, format="PNG")

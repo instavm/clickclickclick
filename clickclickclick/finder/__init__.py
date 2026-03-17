@@ -4,6 +4,7 @@ import subprocess
 import re
 import base64
 import json
+import pyautogui
 import logging
 from clickclickclick.executor import Executor
 from PIL import Image
@@ -64,36 +65,56 @@ class BaseFinder(ABC):
             print(coordinates, i)
 
             try:
+                # Try parsing as JSON first (for models that return JSON)
                 response_dict = json.loads(response)
                 ymin = int(response_dict["ymin"])
                 xmin = int(response_dict["xmin"])
                 ymax = int(response_dict["ymax"])
                 xmax = int(response_dict["xmax"])
-                if ymin == 0 and xmin == 0 and xmax == 0 and ymax == 0:
+            except (json.JSONDecodeError, KeyError):
+                # Try parsing as comma-separated values (for ollama models)
+                try:
+                    parts = response.strip().split(',')
+                    if len(parts) == 4:
+                        ymin, xmin, ymax, xmax = map(int, parts)
+                        logger.debug(f"Parsed CSV response: {ymin},{xmin},{ymax},{xmax}")
+                    else:
+                        logger.debug(f"Could not decode response: {response}")
+                        continue
+                except (ValueError, AttributeError) as e:
+                    logger.debug(f"Could not parse response: {response}, error: {e}")
                     continue
-                orig_left, orig_top, _, _ = coordinates
 
-                y_min_percent = (orig_top + ymin) / self.OUTPUT_HEIGHT * self.IMAGE_HEIGHT
-                x_min_percent = (orig_left + xmin) / self.OUTPUT_WIDTH * self.IMAGE_WIDTH
-                y_max_percent = (orig_top + ymax) / self.OUTPUT_HEIGHT * self.IMAGE_HEIGHT
-                x_max_percent = (orig_left + xmax) / self.OUTPUT_WIDTH * self.IMAGE_WIDTH
-                ans = ",".join(
+            if ymin == 0 and xmin == 0 and xmax == 0 and ymax == 0:
+                continue
+            orig_left, orig_top, _, _ = coordinates
+
+            # Safety check for division by zero
+            if not self.OUTPUT_HEIGHT or not self.OUTPUT_WIDTH:
+                logger.error("OUTPUT_HEIGHT or OUTPUT_WIDTH not set, using raw coordinates")
+                ans = f"{ymin},{xmin},{ymax},{xmax}"
+                logger.debug(f"Raw coordinates: {ans}")
+                continue
+
+            y_min_percent = (orig_top + ymin) / self.OUTPUT_HEIGHT * self.IMAGE_HEIGHT
+            x_min_percent = (orig_left + xmin) / self.OUTPUT_WIDTH * self.IMAGE_WIDTH
+            y_max_percent = (orig_top + ymax) / self.OUTPUT_HEIGHT * self.IMAGE_HEIGHT
+            x_max_percent = (orig_left + xmax) / self.OUTPUT_WIDTH * self.IMAGE_WIDTH
+            ans = ",".join(
+                map(
+                    str,
                     map(
-                        str,
-                        map(
-                            int,
-                            [
-                                y_min_percent,
-                                x_min_percent,
-                                y_max_percent,
-                                x_max_percent,
-                            ],
-                        ),
-                    )
+                        int,
+                        [
+                            y_min_percent,
+                            x_min_percent,
+                            y_max_percent,
+                            x_max_percent,
+                        ],
+                    ),
                 )
-                print(ans)
-            except json.JSONDecodeError:
-                print("Could not decode response")
+            )
+            logger.debug(f"Final scaled coordinates: {ans}")
 
         return ans
 
@@ -110,7 +131,6 @@ class BaseFinder(ABC):
                 raise Exception("Failed to parse screen size from adb output.")
         except Exception as e:
             # Attempt to get screen size using pyautogui (for desktops)
-            import pyautogui
             screen_x, screen_y = pyautogui.size()
 
         print(f"Screen size: x y {screen_x} {screen_y}")
