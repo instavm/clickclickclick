@@ -2,7 +2,8 @@
 
 ### A framework to enable autonomous android and computer use using any LLM (local or remote)
 
-![click3](https://github.com/user-attachments/assets/103afd59-ae29-45d2-9d77-75375b1538a0)
+<img width="1024" height="651" alt="image" src="https://github.com/user-attachments/assets/106dfd25-d40b-47e1-ac89-85cf02fd3d74" />
+
 
 ## Demos
 
