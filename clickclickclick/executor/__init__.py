@@ -6,6 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 class Executor(ABC):
+    def __init__(self):
+        self.image_quality = 100  # Default quality percentage (1-100)
 
     @abstractmethod
     def move_mouse(self, x: int, y: int, observation: str) -> bool:
@@ -69,8 +71,4 @@ class Executor(ABC):
 
     @abstractmethod
     def click_at_a_point(self, x: int, y: int, observation: str) -> bool:
-        pass
-
-    @abstractmethod
-    def long_press_at_a_point(self, x: int, y: int, observation: str) -> bool:
         pass
