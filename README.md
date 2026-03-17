@@ -20,6 +20,21 @@ Currently supporting local models via Ollama (Llama 3.2-vision, qwen3.5:4b), Gem
 
 The best result currently comes from using Gemini 3.1 Flash-Lite as both planner and finder.
 
+- [Quick Start](#-quick-start)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
+  - [Web Interface (Gradio)](#web-interface-gradio)
+  - [Command Line Interface](#command-line-interface)
+  - [Python API](#python-api)
+  - [REST API](#rest-api)
+- [Configuration](#-configuration)
+- [Model Recommendations](#-model-recommendations)
+- [Examples](#-examples)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+
 **Ollama models:** qwen3.5:4b works as planner (slow, basic navigation) but not reliable as finder (poor UI element detection). Use with `--image-quality=45` for better performance.
 
 ![model recommendations](https://github.com/user-attachments/assets/355865f9-704b-483c-a23b-5dc9be54aeda)
@@ -211,3 +226,7 @@ pre-commit run --all-files
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+<div align="center">
+Made with ❤️ by InstaVM | Follow us for updates!
+</div>
